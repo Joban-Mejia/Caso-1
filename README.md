@@ -1,2 +1,5 @@
 # Caso-1
-#Integrantes
+*Colaboradores:*
+- Tomas Bonnet
+- Joban Mejia
+- Angelica Rodriguez
