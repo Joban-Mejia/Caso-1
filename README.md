@@ -1,5 +1,5 @@
 # Caso-1
 *Colaboradores:*
-- Tomas Bonnet
+- Thomas Bonnett
 - Joban Mejia
 - Angelica Rodriguez
