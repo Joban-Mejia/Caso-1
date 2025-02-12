@@ -13,7 +13,9 @@ public class Main {
         System.out.print("Ingrese el límite del buzón de revisión: ");
         int limiteBuzonRevision = scanner.nextInt();
 
-        BuzonReproceso buzonReproceso = new BuzonReproceso(Integer.MAX_VALUE);
+
+        BuzonReproceso buzonReproceso = new BuzonReproceso(1000); // Capacidad del buzón de reproceso
+        
         BuzonRevision buzonRevision = new BuzonRevision(limiteBuzonRevision);
         Deposito deposito = new Deposito(numProductos);
 

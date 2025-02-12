@@ -5,6 +5,7 @@ public class BuzonReproceso {
     private Queue<Producto> productos = new LinkedList<>();
     private final int capacidad;
 
+    // Constructor que recibe la capacidad del buzón
     public BuzonReproceso(int capacidad) {
         this.capacidad = capacidad;
     }
