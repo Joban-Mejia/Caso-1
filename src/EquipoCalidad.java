@@ -17,22 +17,27 @@ public class EquipoCalidad implements Runnable {
     @Override
     public void run() {
         try {
-            while (fallosActuales < maxFallos) {
+            // Usamos un bucle controlado por el estado del producto
+            boolean continuar = true;
+            while (continuar) {
                 Producto producto = buzonRevision.retirarProducto();
+
+                // Verificar si el producto es de tipo FIN
                 if (producto.getEstado() == EstadoProducto.FIN) {
-                    return;
-                }
-
-                boolean aprobado = revisarProducto(producto);
-                if (aprobado) {
-                    deposito.almacenarProducto(producto);
+                    continuar = false; // Salir del bucle
                 } else {
-                    buzonReproceso.agregarProducto(producto);
-                    fallosActuales++;
-                }
+                    boolean aprobado = revisarProducto(producto);
+                    if (aprobado) {
+                        deposito.almacenarProducto(producto);
+                    } else {
+                        buzonReproceso.agregarProducto(producto);
+                        fallosActuales++;
+                    }
 
-                if (fallosActuales >= maxFallos) {
-                    System.out.println("Máximo de fallos alcanzado. Todos los productos serán aprobados.");
+                    // Verificar si se alcanzó el máximo de fallos
+                    if (fallosActuales >= maxFallos) {
+                        System.out.println("Máximo de fallos alcanzado. Todos los productos serán aprobados.");
+                    }
                 }
             }
         } catch (InterruptedException e) {
