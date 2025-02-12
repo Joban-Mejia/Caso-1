@@ -2,6 +2,7 @@ public class Productor implements Runnable {
     private BuzonReproceso buzonReproceso;
     private BuzonRevision buzonRevision;
     private int numProductos;
+    int productosGenerados = 0;
 
     public Productor(BuzonReproceso buzonReproceso, BuzonRevision buzonRevision, int numProductos) {
         this.buzonReproceso = buzonReproceso;
@@ -12,11 +13,12 @@ public class Productor implements Runnable {
     @Override
     public void run() {
         try {
-            while (true) {
+            while (productosGenerados < numProductos) {
                 if (!buzonReproceso.estaVacio()) {
                     Producto producto = buzonReproceso.retirarProducto();
                     producto.setEstado(EstadoProducto.REPROCESADO);
                     buzonRevision.agregarProducto(producto);
+                    System.out.println("=============================================================El producto es" + producto);
                 } else {
                     Producto producto = new Producto(EstadoProducto.NUEVO);
                     buzonRevision.agregarProducto(producto);
@@ -24,7 +26,7 @@ public class Productor implements Runnable {
 
                 // Verificar si se ha alcanzado el número de productos requeridos
                 if (buzonRevision.getProductosAlmacenados() >= numProductos) {
-                    break;
+                    System.out.println("==============================El número de productos requeridos fue alcanzado");
                 }
             }
         } catch (InterruptedException e) {
