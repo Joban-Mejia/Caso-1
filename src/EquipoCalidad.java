@@ -17,10 +17,10 @@ public class EquipoCalidad implements Runnable {
     @Override
     public void run() {
         try {
-            while (true) {
+            while (fallosActuales < maxFallos) {
                 Producto producto = buzonRevision.retirarProducto();
                 if (producto.getEstado() == EstadoProducto.FIN) {
-                    break;
+                    return;
                 }
 
                 boolean aprobado = revisarProducto(producto);
