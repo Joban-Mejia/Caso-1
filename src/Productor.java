@@ -23,6 +23,9 @@ public class Productor implements Runnable {
                     
                     Producto producto = new Producto(EstadoProducto.NUEVO);
                     buzonRevision.agregarProducto(producto);
+                    Thread.sleep(10000); 
+                    System.out.println("SE HA CREADO UN PRODUCTO (CLASE PRODUCTOR FUNCIONANDO)");
+
                 }
 
                 Thread.sleep(1000);

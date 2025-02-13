@@ -14,6 +14,7 @@ public class BuzonRevision {
             wait();
         }
         productos.add(producto);
+        System.out.println("Se ha agregado un producto al buzo de revisión");
         notifyAll();
     }
 
@@ -22,6 +23,7 @@ public class BuzonRevision {
             wait();
         }
         Producto producto = productos.poll();
+        System.out.println("Se ha retirado un producto del buzón de revisión...");
         notifyAll();
         return producto;
     }
