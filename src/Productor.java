@@ -14,11 +14,14 @@ public class Productor implements Runnable {
         try {
             
             for (int productosProducidos = 0; productosProducidos < numProductos; ) {
-                if (!buzonReproceso.estaVacio()) {
+                if (!buzonReproceso.estaVacio()) 
+                {
+
                     // Reprocesar un producto del buzón de reproceso
                     Producto producto = buzonReproceso.retirarProducto();
                     producto.setEstado(EstadoProducto.REPROCESADO);
                     buzonRevision.agregarProducto(producto);
+                    System.out.println("SE HA REPROCESADO EL PRODUCTO" + producto); //TODO No está  entrando, no está reprocesando
                 } else {
                     
                     Producto producto = new Producto(EstadoProducto.NUEVO);

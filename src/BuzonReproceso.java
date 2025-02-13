@@ -3,15 +3,13 @@ import java.util.LinkedList;
 
 public class BuzonReproceso {
     private Queue<Producto> productos = new LinkedList<>();
-    private final int capacidad;
+    
 
     // Constructor que recibe la capacidad del buzón
-    public BuzonReproceso(int capacidad) {
-        this.capacidad = capacidad;
-    }
+    public BuzonReproceso() {  }
 
     public synchronized void agregarProducto(Producto producto) throws InterruptedException {
-        while (productos.size() >= capacidad) {
+        while (productos.isEmpty()) {
             wait();
         }
         productos.add(producto);

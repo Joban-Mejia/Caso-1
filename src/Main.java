@@ -14,8 +14,7 @@ public class Main {
         int limiteBuzonRevision = scanner.nextInt();
 
 
-        BuzonReproceso buzonReproceso = new BuzonReproceso(1000); // Capacidad del buzón de reproceso
-        
+        BuzonReproceso buzonReproceso = new BuzonReproceso(); // Buzon de reproceso sin capacidad        
         BuzonRevision buzonRevision = new BuzonRevision(limiteBuzonRevision);
         Deposito deposito = new Deposito(numProductos);
 
