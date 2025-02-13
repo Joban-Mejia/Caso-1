@@ -8,8 +8,8 @@ public class Deposito {
 
     public synchronized void almacenarProducto(Producto producto) {
     productosAlmacenados++;
-    System.out.println("Se ha creado el producto número "+ productosAlmacenados);
-        if (productosAlmacenados >= meta) {
+    System.out.println("Se ha almacenado el producto número "+ productosAlmacenados);
+        if (productosAlmacenados == meta) {
             System.out.println("Meta alcanzada. Enviando producto FIN.");
             // Enviar producto FIN al buzón de reproceso
         }

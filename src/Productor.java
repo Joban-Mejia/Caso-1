@@ -12,8 +12,9 @@ public class Productor implements Runnable {
     @Override
     public void run() {
         try {
+            int productosProducidos = 0;
             
-            for (int productosProducidos = 0; productosProducidos < numProductos; ) {
+            while (productosProducidos < numProductos) {
                 if (!buzonReproceso.estaVacio()) 
                 {
 
@@ -22,18 +23,23 @@ public class Productor implements Runnable {
                     producto.setEstado(EstadoProducto.REPROCESADO);
                     buzonRevision.agregarProducto(producto);
                     System.out.println("SE HA REPROCESADO EL PRODUCTO" + producto); //TODO No está  entrando, no está reprocesando
+                
                 } else {
                     
                     Producto producto = new Producto(EstadoProducto.NUEVO);
                     buzonRevision.agregarProducto(producto);
-                    Thread.sleep(10000); 
-                    System.out.println("SE HA CREADO UN PRODUCTO (CLASE PRODUCTOR FUNCIONANDO)");
+                    Thread.sleep(10000); //simulado de tiempo de producción (temporal) 
+                    System.out.println("SE HA CREADO UN PRODUCTO (CLASE PRODUCTOR FUNCIONANDO) ----" + producto);
 
                 }
 
-                Thread.sleep(1000);
-                productosProducidos++;
+            
+            productosProducidos++;
+            Thread.sleep(1000);
+            
             }
+            System.out.println("El productor ha terminado de producir " + numProductos + " productos.");
+
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
