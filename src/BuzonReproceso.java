@@ -16,9 +16,12 @@ public class BuzonReproceso {
                 wait();
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
+                return null; // Salir si el hilo es interrumpido
             }
         }
-        return productos.poll();
+        Producto producto = productos.poll();
+        notifyAll(); /* Despierta los hilos que esperan agregar */
+        return producto;
     }
 
     public synchronized boolean estaVacio() {

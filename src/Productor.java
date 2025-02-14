@@ -28,15 +28,34 @@ public class Productor extends Thread {
                 } else {
                     synchronized (Productor.class) {
                         if (productosGenerados >= totalProductos) {
-                            break; // Ya se generaron todos los productos necesarios
+                            System.out.println("Se han generado todos los productos. Enviando FIN...");
+                            Producto fin = new Producto(EstadoProducto.FIN);
+                            buzonRevision.agregar(fin);
+                            Main.finalizado = true; /* Marca la finalización para todos los hilos */
+                            break; /* Asegura que el productor salga del bucle */
+
+                            /*
+                             * Este break dentro de synchronized (Productor.class)
+                             * solo evita que ese hilo genere más productos,
+                             * pero si otros hilos siguen ejecutándose,
+                             * el while (!Main.finalizado) los mantiene vivos.
+                             */
+
                         }
                         producto = new Producto(EstadoProducto.NUEVO);
                         productosGenerados++;
+
+                        /* manda Producto FIN cuando se han generado todos los productos */
+                        if (productosGenerados >= totalProductos) {
+                            System.out.println("Se han generado todos los productos. Enviando FIN...");
+                            Producto fin = new Producto(EstadoProducto.FIN);
+                            buzonRevision.agregar(fin);
+                        }
                     }
                 }
-            }
 
-            buzonRevision.agregar(producto);
+                buzonRevision.agregar(producto);
+            }
         }
     }
 }
