@@ -1,47 +1,42 @@
-public class Productor implements Runnable {
-    private BuzonReproceso buzonReproceso;
-    private BuzonRevision buzonRevision;
-    private int numProductos;
+public class Productor extends Thread {
+    private final BuzonReproceso buzonReproceso;
+    private final BuzonRevision buzonRevision;
+    private final int totalProductos;
+    private static int productosGenerados = 0;
 
-    public Productor(BuzonReproceso buzonReproceso, BuzonRevision buzonRevision, int numProductos) {
+    public Productor(BuzonReproceso buzonReproceso, BuzonRevision buzonRevision, int totalProductos) {
         this.buzonReproceso = buzonReproceso;
         this.buzonRevision = buzonRevision;
-        this.numProductos = numProductos;
+        this.totalProductos = totalProductos;
     }
 
     @Override
     public void run() {
-        try {
-            int productosProducidos = 0;
-            
-            while (productosProducidos < numProductos) {
-                if (!buzonReproceso.estaVacio()) 
-                {
+        while (!Main.finalizado) {
+            Producto producto;
 
-                    // Reprocesar un producto del buzón de reproceso
-                    Producto producto = buzonReproceso.retirarProducto();
+            synchronized (buzonReproceso) {
+                if (!buzonReproceso.estaVacio()) {
+                    producto = buzonReproceso.retirar();
+                    if (producto.getEstado() == EstadoProducto.FIN) {
+                        System.out.println("Productor recibe producto FIN, terminando...");
+                        Main.finalizado = true;
+                        break;
+                    }
                     producto.setEstado(EstadoProducto.REPROCESADO);
-                    buzonRevision.agregarProducto(producto);
-                    System.out.println("SE HA REPROCESADO EL PRODUCTO" + producto); //TODO No está  entrando, no está reprocesando
-                
+                    System.out.println("Reprocesando producto ID=" + producto.getId());
                 } else {
-                    
-                    Producto producto = new Producto(EstadoProducto.NUEVO);
-                    buzonRevision.agregarProducto(producto);
-                    Thread.sleep(10000); //simulado de tiempo de producción (temporal) 
-                    System.out.println("SE HA CREADO UN PRODUCTO (CLASE PRODUCTOR FUNCIONANDO) ----" + producto);
-
+                    synchronized (Productor.class) {
+                        if (productosGenerados >= totalProductos) {
+                            break; // Ya se generaron todos los productos necesarios
+                        }
+                        producto = new Producto(EstadoProducto.NUEVO);
+                        productosGenerados++;
+                    }
                 }
-
-            
-            productosProducidos++;
-            Thread.sleep(1000);
-            
             }
-            System.out.println("El productor ha terminado de producir " + numProductos + " productos.");
 
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            buzonRevision.agregar(producto);
         }
     }
 }

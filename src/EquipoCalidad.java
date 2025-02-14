@@ -1,56 +1,52 @@
 import java.util.Random;
 
-public class EquipoCalidad implements Runnable {
-    private BuzonRevision buzonRevision;
-    private BuzonReproceso buzonReproceso;
-    private Deposito deposito;
-    private int maxFallos;
+public class EquipoCalidad extends Thread {
+    private final BuzonRevision buzonRevision;
+    private final BuzonReproceso buzonReproceso;
+    private final Deposito deposito;
+    private final int maxFallos;
     private int fallosActuales = 0;
+    private final Random random = new Random();
 
-    public EquipoCalidad(BuzonRevision buzonRevision, BuzonReproceso buzonReproceso, Deposito deposito, int maxFallos) {
+    public EquipoCalidad(BuzonRevision buzonRevision, BuzonReproceso buzonReproceso, Deposito deposito, int totalProductos) {
         this.buzonRevision = buzonRevision;
         this.buzonReproceso = buzonReproceso;
         this.deposito = deposito;
-        this.maxFallos = maxFallos;
+        this.maxFallos = (int) Math.floor(totalProductos * 0.10);
     }
 
     @Override
     public void run() {
-        try {
-            // Usamos un bucle controlado por el estado del producto
-            boolean continuar = true;
-            while (continuar) {
-                Producto producto = buzonRevision.retirarProducto();
+        while (!Main.finalizado) {
+            Producto producto = buzonRevision.retirar();
 
-                // Verificar si el producto es de tipo FIN
-                if (producto.getEstado() == EstadoProducto.FIN) {
-                    continuar = false; // Salir del bucle
-                } else {
-                    boolean aprobado = revisarProducto(producto);
-                    if (aprobado) {
-                        deposito.almacenarProducto(producto);
-                    } else {
-                        buzonReproceso.agregarProducto(producto);
-                        fallosActuales++;
-                    }
+            if (producto == null) continue;
 
-                    // Verificar si se alcanzó el máximo de fallos
-                    if (fallosActuales >= maxFallos) {
-                        System.out.println("Máximo de fallos alcanzado. Todos los productos serán aprobados.");
-                    }
+            int resultadoRevision = random.nextInt(100) + 1;
+            boolean esDefectuoso = resultadoRevision % 7 == 0;
+
+            if (esDefectuoso && fallosActuales < maxFallos) {
+                producto.setEstado(EstadoProducto.RECHAZADO);
+                fallosActuales++;
+                buzonReproceso.agregar(producto);
+                System.out.println("Producto rechazado ID=" + producto.getId() + " (Fallo #" + fallosActuales + ")");
+            } else {
+                producto.setEstado(EstadoProducto.APROBADO);
+                deposito.agregar(producto);
+                System.out.println("Producto aprobado ID=" + producto.getId());
+
+                if (fallosActuales >= maxFallos) {
+                    System.out.println("Límite de fallos alcanzado, aprobando todos los siguientes productos.");
                 }
             }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-    }
 
-    private boolean revisarProducto(Producto producto) {
-        Random rand = new Random();
-        int numero = rand.nextInt(100) + 1;
-        if (numero % 7 == 0 && fallosActuales < maxFallos) {
-            return false;
+            if (fallosActuales >= maxFallos) {
+                Producto fin = new Producto(EstadoProducto.FIN);
+                buzonReproceso.agregar(fin);
+                System.out.println("Equipo de calidad envía FIN. Terminando...");
+                Main.finalizado = true; 
+                break;
+            }
         }
-        return true;
     }
 }
