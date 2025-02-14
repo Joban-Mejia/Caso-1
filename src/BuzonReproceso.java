@@ -17,7 +17,7 @@ public class BuzonReproceso {
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
-        }
+        }//prueba funcionamiento de las ramas
         return productos.poll();
     }
 
@@ -25,3 +25,5 @@ public class BuzonReproceso {
         return productos.isEmpty();
     }
 }
+
+
