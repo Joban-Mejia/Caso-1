@@ -10,6 +10,7 @@ public class Deposito {
         productosAprobados++;
         System.out.println("Producto almacenado en el depósito: ID=" + producto.getId());
 
+        
         if (productosAprobados >= meta) {
             System.out.println("Se ha alcanzado la meta de productos aprobados. Generando producto FIN...");
             Producto fin = new Producto(EstadoProducto.FIN);
