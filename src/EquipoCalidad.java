@@ -18,9 +18,13 @@ public class EquipoCalidad extends Thread {
     @Override
     public void run() {
         while (!Main.finalizado) {
-            Producto producto = buzonRevision.retirar();
+            Producto producto;
 
-            if (producto == null) continue;
+            // Espera semiactiva // corrección
+            while ((producto = buzonRevision.retirar()) == null) {
+                Thread.yield(); 
+                if (Main.finalizado) return; // Producto FIN, entonces salir
+            }
 
             int resultadoRevision = random.nextInt(100) + 1;
             boolean esDefectuoso = resultadoRevision % 7 == 0;
@@ -44,9 +48,10 @@ public class EquipoCalidad extends Thread {
                 Producto fin = new Producto(EstadoProducto.FIN);
                 buzonReproceso.agregar(fin);
                 System.out.println("Equipo de calidad envía FIN. Terminando...");
-                Main.finalizado = true; 
-                break;
+                Main.finalizado = true;
+                return; 
             }
         }
     }
 }
+
