@@ -16,19 +16,28 @@ public class Productor extends Thread {
             Producto producto;
 
             synchronized (buzonReproceso) {
+                while (buzonReproceso.estaVacio() && productosGenerados >= totalProductos) {
+                    try {
+                        buzonReproceso.wait(); //Espera pasiva --corrección
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        return;
+                    }
+                }
+
                 if (!buzonReproceso.estaVacio()) {
                     producto = buzonReproceso.retirar();
                     if (producto.getEstado() == EstadoProducto.FIN) {
-                        System.out.println("Productor recibe producto FIN, terminando...");
+                        System.out.println("Productor recibe producto FIN, terminando ejecución...");
                         Main.finalizado = true;
-                        break;
+                        return;
                     }
                     producto.setEstado(EstadoProducto.REPROCESADO);
                     System.out.println("Reprocesando producto ID=" + producto.getId());
                 } else {
                     synchronized (Productor.class) {
                         if (productosGenerados >= totalProductos) {
-                            break; // Ya se generaron todos los productos necesarios
+                            return;
                         }
                         producto = new Producto(EstadoProducto.NUEVO);
                         productosGenerados++;
@@ -36,7 +45,19 @@ public class Productor extends Thread {
                 }
             }
 
-            buzonRevision.agregar(producto);
+            synchronized (buzonRevision) {
+                while (buzonRevision.estaLleno()) {
+                    try {
+                        System.out.println("Buzón de revisión lleno, esperando espacio...");
+                        buzonRevision.wait(); // espera pasiva 
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        return;
+                    }
+                }
+                buzonRevision.agregar(producto);
+                buzonRevision.notifyAll();
         }
     }
+}
 }
