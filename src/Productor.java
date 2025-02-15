@@ -29,13 +29,21 @@ public class Productor extends Thread {
                     producto = buzonReproceso.retirar();
                     if (producto.getEstado() == EstadoProducto.FIN) {
                         System.out.println("Productor recibe producto FIN, terminando ejecución...");
-                        Main.finalizado = true;
+                        
+                        synchronized (buzonReproceso) {
+                            Main.finalizado = true;
+                            buzonReproceso.notifyAll();  
+                        }
+                        synchronized (buzonRevision) {
+                            buzonRevision.notifyAll();  
+                        }
                         return;
+
                     }
                     producto.setEstado(EstadoProducto.REPROCESADO);
-                    System.out.println("Reprocesando producto ID=" + producto.getId());
-                } else {
-                    synchronized (Productor.class) {
+                    System.out.println("Reprocesando producto ID=" + producto.getId());} 
+                    
+                    else { synchronized (Productor.class) {
                         if (productosGenerados >= totalProductos) {
                             return;
                         }

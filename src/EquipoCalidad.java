@@ -31,10 +31,12 @@ public class EquipoCalidad extends Thread {
 
             if (esDefectuoso && fallosActuales < maxFallos) {
                 producto.setEstado(EstadoProducto.RECHAZADO);
-                fallosActuales++;
-                buzonReproceso.agregar(producto);
-                System.out.println("Producto rechazado ID=" + producto.getId() + " (Fallo #" + fallosActuales + ")");
-            } else {
+            fallosActuales++;
+            buzonReproceso.agregar(producto);
+
+                System.out.println("Producto rechazado ID=" + producto.getId() + " (Fallo #" + fallosActuales + ")");} 
+            
+            else {
                 producto.setEstado(EstadoProducto.APROBADO);
                 deposito.agregar(producto);
                 System.out.println("Producto aprobado ID=" + producto.getId());
@@ -44,12 +46,19 @@ public class EquipoCalidad extends Thread {
                 }
             }
 
-            if (fallosActuales >= maxFallos) {
-                Producto fin = new Producto(EstadoProducto.FIN);
-                buzonReproceso.agregar(fin);
-                System.out.println("Equipo de calidad envía FIN. Terminando...");
+            if (fallosActuales >= maxFallos) { synchronized (buzonReproceso) {
+                System.out.println("Generando producto FIN y notificando a los hilos");
                 Main.finalizado = true;
-                return; 
+                    buzonReproceso.agregar(new Producto(EstadoProducto.FIN));
+                    buzonReproceso.notifyAll();
+                 }
+                synchronized (buzonRevision) {
+                    buzonRevision.notifyAll(); 
+                }
+                return;
+
+                
+                
             }
         }
     }
