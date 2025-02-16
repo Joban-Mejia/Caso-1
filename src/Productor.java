@@ -18,7 +18,7 @@ public class Productor extends Thread {
             synchronized (buzonReproceso) {
                 while (buzonReproceso.estaVacio() && productosGenerados >= totalProductos) {
                     try {
-                        buzonReproceso.wait(); //Espera pasiva --corrección
+                        buzonReproceso.wait(); //Espera pasiva
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                         return;
@@ -27,23 +27,19 @@ public class Productor extends Thread {
 
                 if (!buzonReproceso.estaVacio()) {
                     producto = buzonReproceso.retirar();
+
+                    // Solo los Productores verifican si el producto es FIN
                     if (producto.getEstado() == EstadoProducto.FIN) {
                         System.out.println("Productor recibe producto FIN, terminando ejecución...");
-                        
-                        synchronized (buzonReproceso) {
-                            Main.finalizado = true;
-                            buzonReproceso.notifyAll();  
-                        }
-                        synchronized (buzonRevision) {
-                            buzonRevision.notifyAll();  
-                        }
+                        Main.finalizado = true;
+                        buzonReproceso.notifyAll(); // Notificar a otros productores
                         return;
-
                     }
+
                     producto.setEstado(EstadoProducto.REPROCESADO);
-                    System.out.println("Reprocesando producto ID=" + producto.getId());} 
-                    
-                    else { synchronized (Productor.class) {
+                    System.out.println("Reprocesando producto ID=" + producto.getId());
+                } else {
+                    synchronized (Productor.class) {
                         if (productosGenerados >= totalProductos) {
                             return;
                         }
@@ -65,7 +61,7 @@ public class Productor extends Thread {
                 }
                 buzonRevision.agregar(producto);
                 buzonRevision.notifyAll();
+            }
         }
     }
-}
 }

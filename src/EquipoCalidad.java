@@ -18,25 +18,18 @@ public class EquipoCalidad extends Thread {
     @Override
     public void run() {
         while (!Main.finalizado) {
-            Producto producto;
-
-            // Espera semiactiva // corrección
-            while ((producto = buzonRevision.retirar()) == null) {
-                Thread.yield(); 
-                if (Main.finalizado) return; // Producto FIN, entonces salir
-            }
+            Producto producto = buzonRevision.retirar();
+            if (producto == null) continue; // Evitar null si la producción finalizó
 
             int resultadoRevision = random.nextInt(100) + 1;
             boolean esDefectuoso = resultadoRevision % 7 == 0;
 
             if (esDefectuoso && fallosActuales < maxFallos) {
                 producto.setEstado(EstadoProducto.RECHAZADO);
-            fallosActuales++;
-            buzonReproceso.agregar(producto);
-
-                System.out.println("Producto rechazado ID=" + producto.getId() + " (Fallo #" + fallosActuales + ")");} 
-            
-            else {
+                fallosActuales++;
+                buzonReproceso.agregar(producto);
+                System.out.println("Producto rechazado ID=" + producto.getId() + " (Fallo #" + fallosActuales + ")"); 
+            } else {
                 producto.setEstado(EstadoProducto.APROBADO);
                 deposito.agregar(producto);
                 System.out.println("Producto aprobado ID=" + producto.getId());
@@ -46,19 +39,14 @@ public class EquipoCalidad extends Thread {
                 }
             }
 
-            if (fallosActuales >= maxFallos) { synchronized (buzonReproceso) {
-                System.out.println("Generando producto FIN y notificando a los hilos");
-                Main.finalizado = true;
+            // Cuando se alcanzan los fallos máximos, se genera el producto FIN
+            if (fallosActuales >= maxFallos) { 
+                synchronized (buzonReproceso) {
+                    System.out.println("Generando producto FIN y notificando a los productores");
                     buzonReproceso.agregar(new Producto(EstadoProducto.FIN));
                     buzonReproceso.notifyAll();
-                 }
-                synchronized (buzonRevision) {
-                    buzonRevision.notifyAll(); 
                 }
                 return;
-
-                
-                
             }
         }
     }
