@@ -53,7 +53,7 @@ public class EquipoCalidad extends Thread {
                 else {
                     producto.setEstado(EstadoProducto.APROBADO);
                     deposito.agregar(producto);
-                    System.out.println("Producto aprobado ID=" + producto.getId());
+                    System.out.println("Producto aprobado ID = " + producto.getId());
 
                     if (fallosActuales >= maxFallos) {
                         System.out.println("Límite de fallos alcanzado, aprobando todos los siguientes productos.");
