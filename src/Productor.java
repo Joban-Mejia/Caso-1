@@ -48,6 +48,10 @@ public class Productor extends Thread {
                     }
                     producto = new Producto(EstadoProducto.NUEVO);
                     productosGenerados++;
+
+                    int productosFaltantes = totalProductos - productosGenerados;
+                    System.out.println("Productos generados: " + productosGenerados +
+                            " | Faltantes: " + productosFaltantes);
                 }
             }
 

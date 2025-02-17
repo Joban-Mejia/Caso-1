@@ -13,9 +13,10 @@ public class Deposito {
         System.out.println("Producto almacenado en el depósito: ID = " + producto.getId());
 
         if (productosAprobados >= meta) {
-            System.out.println("===================== Meta alcanzada. Enviando Producto FIN... =====================");
+            System.out.println("======================================= META ALCANZADA. ENVIANDO EL PRODUCTO FIN... =======================================");
             Producto fin = new Producto(EstadoProducto.FIN);
             buzonReproceso.agregar(fin);
+            Main.finalizado = true;
         }
     }
 }
