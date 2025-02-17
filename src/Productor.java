@@ -13,59 +13,57 @@ public class Productor extends Thread {
     @Override
     public void run() {
         while (!Main.finalizado) {
-            Producto producto;
+            Producto producto = null;
 
             synchronized (buzonReproceso) {
-                while (buzonReproceso.estaVacio() && productosGenerados >= totalProductos) {
-                    try {
-                        buzonReproceso.wait(); //Espera pasiva --corrección
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                        return;
-                    }
-                }
-
                 if (!buzonReproceso.estaVacio()) {
                     producto = buzonReproceso.retirar();
-                    if (producto.getEstado() == EstadoProducto.FIN) {
+                    if (producto != null && producto.getEstado() == EstadoProducto.FIN) {
                         System.out.println("Productor recibe producto FIN, terminando ejecución...");
-                        
+
+                        Main.finalizado = true;
+
                         synchronized (buzonReproceso) {
-                            Main.finalizado = true;
-                            buzonReproceso.notifyAll();  
+                            buzonReproceso.notifyAll();
                         }
                         synchronized (buzonRevision) {
-                            buzonRevision.notifyAll();  
+                            buzonRevision.notifyAll();
                         }
-                        return;
 
+                        return;
                     }
-                    producto.setEstado(EstadoProducto.REPROCESADO);
-                    System.out.println("Reprocesando producto ID=" + producto.getId());} 
-                    
-                    else { synchronized (Productor.class) {
-                        if (productosGenerados >= totalProductos) {
-                            return;
-                        }
-                        producto = new Producto(EstadoProducto.NUEVO);
-                        productosGenerados++;
+
+                    if (producto != null) {
+                        producto.setEstado(EstadoProducto.REPROCESADO);
+                        System.out.println("Reprocesando producto ID=" + producto.getId());
                     }
                 }
             }
 
+            /* Si no hay productos en el buzón de reproceso, generar un nuevo producto */
+            if (producto == null) {
+                synchronized (Productor.class) {
+                    if (productosGenerados >= totalProductos) {
+                        return; /* Si ya se generaron todos, el hilo termina */
+                    }
+                    producto = new Producto(EstadoProducto.NUEVO);
+                    productosGenerados++;
+                }
+            }
+
+            /* Almacenamos el producto en el Buzón de Revisión */
             synchronized (buzonRevision) {
                 while (buzonRevision.estaLleno()) {
                     try {
                         System.out.println("Buzón de revisión lleno, esperando espacio...");
-                        buzonRevision.wait(); // espera pasiva 
+                        buzonRevision.wait(); // Espera pasiva
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                         return;
                     }
                 }
                 buzonRevision.agregar(producto);
-                buzonRevision.notifyAll();
+            }
         }
     }
-}
 }

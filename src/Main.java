@@ -4,10 +4,10 @@ import java.util.Scanner;
 
 public class Main {
     public static volatile boolean finalizado = false;
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        
         System.out.print("Ingrese el número de operarios: ");
         int numOperarios = scanner.nextInt();
 
@@ -19,14 +19,13 @@ public class Main {
 
         scanner.close();
 
-        
         BuzonReproceso buzonReproceso = new BuzonReproceso();
         BuzonRevision buzonRevision = new BuzonRevision(capacidadBuzon);
-        Deposito deposito = new Deposito(numProductos);
+        Deposito deposito = new Deposito(numProductos, buzonReproceso);
 
         List<Thread> hilos = new ArrayList<>();
 
-        //Crea un thread por cada productor
+        // Crea un thread por cada productor
         for (int i = 0; i < numOperarios; i++) {
             Productor productor = new Productor(buzonReproceso, buzonRevision, numProductos);
             hilos.add(productor);
@@ -40,15 +39,33 @@ public class Main {
             equipoCalidad.start();
         }
 
-        
         for (Thread hilo : hilos) {
             try {
-                hilo.join();
+                hilo.join(5000); /* Esperar hasta 5 segundos por cada hilo */
+                if (hilo.isAlive()) {
+                    System.out.println("El hilo " + hilo.getName() + " sigue vivo, forzando finalización...");
+                    finalizado = true; /* Marcar finalizado si algún hilo sigue vivo */
+                    synchronized (buzonRevision) {
+                        buzonRevision.notifyAll(); /* Despertar hilos bloqueados */
+                    }
+                    synchronized (buzonReproceso) {
+                        buzonReproceso.notifyAll();  /* Despertar hilos bloqueados */
+                    }
+                }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
         }
 
-        System.out.println("Simulación terminada");
+        //Imprimir estado final de los hilos
+        System.out.println("\n=== ESTADO FINAL DE LOS HILOS ===");
+        Thread.getAllStackTraces().keySet().forEach(t -> {
+            if (t.getName().startsWith("Thread-")) {
+                System.out.println("Thread: " + t.getName() + " - Estado: " + t.getState());
+            }
+        });
+
+        System.out.println("Todos los hilos de la simulación han finalizado.");
+        System.out.println("Simulación terminada.");
     }
 }

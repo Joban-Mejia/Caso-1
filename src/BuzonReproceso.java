@@ -6,17 +6,24 @@ public class BuzonReproceso {
 
     public synchronized void agregar(Producto producto) {
         productos.add(producto);
-        System.out.println("Producto enviado a reproceso: ID=" + producto.getId());
         notifyAll();
+        System.out.println("Producto enviado a reproceso: ID=" + producto.getId());
     }
 
     public synchronized Producto retirar() {
-        while (productos.isEmpty()) {
+        while (productos.isEmpty() && !Main.finalizado) {
             try {
                 wait();
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
+                return null;
             }
+
+            if (Main.finalizado && productos.isEmpty()) {
+                notifyAll();  /* Despertanddo a todos los hilos bloqueados antes de salir */
+                return null;
+            }
+
         }
         return productos.poll();
     }
@@ -25,4 +32,3 @@ public class BuzonReproceso {
         return productos.isEmpty();
     }
 }
-

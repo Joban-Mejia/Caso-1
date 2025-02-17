@@ -16,22 +16,33 @@ public class BuzonRevision {
                 wait();
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
+                return;
             }
         }
         productos.add(producto);
-        System.out.println("Producto agregado al buzón de revisión: ID=" + producto.getId());
         notifyAll();
+        System.out.println("Producto agregado al buzón de revisión: ID=" + producto.getId());
+
     }
 
     public synchronized Producto retirar() {
-        while (productos.isEmpty()) {
+        while (productos.isEmpty() && !Main.finalizado) {
             try {
                 wait();
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
+                return null;
             }
         }
-        return productos.poll();
+
+        if (Main.finalizado && productos.isEmpty()) {
+            notifyAll();
+            return null;
+        }
+
+        Producto producto = productos.poll();
+        notifyAll();
+        return producto;
     }
 
     public synchronized boolean estaLleno() {
