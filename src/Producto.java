@@ -11,9 +11,9 @@ public class Producto {
         this.estado = estado;
 
         if (estado == EstadoProducto.FIN) {
-            System.out.println("⚠️ Producto FIN creado: ID=" + id);
+            System.out.println("Producto FIN creado: ID=" + id);
         } else {
-            System.out.println("✅ Producto creado: ID=" + id + ", Estado=" + estado);
+            System.out.println("Producto creado: ID=" + id + ", Estado=" + estado);
         }
     }
 
