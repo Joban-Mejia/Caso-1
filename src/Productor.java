@@ -31,7 +31,6 @@ public class Productor extends Thread {
                     // Solo los Productores verifican si el producto es FIN
                     if (producto.getEstado() == EstadoProducto.FIN) {
                         System.out.println("Productor recibe producto FIN, terminando ejecución...");
-                        Main.finalizado = true;
                         buzonReproceso.notifyAll(); // Notificar a otros productores
                         return;
                     }

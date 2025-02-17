@@ -43,11 +43,29 @@ public class Main {
         
         for (Thread hilo : hilos) {
             try {
-                hilo.join();
+                hilo.join(5000); // Espera un máximo de 5 segundos
+                if (hilo.isAlive()) {
+                    System.out.println("El hilo " + hilo.getName() + " sigue vivo, forzando finalización...");
+                    Main.finalizado = true;
+                    synchronized (buzonRevision) {
+                        buzonRevision.notifyAll(); /* Despierta hilos bloqueados */
+                    }
+                    synchronized (buzonReproceso) {
+                        buzonReproceso.notifyAll(); /* Asegura que ningún hilo quede atascado */
+                    }
+                }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
         }
+
+        System.out.println("\n=== ESTADO FINAL DE LOS HILOS CREADOS POR LA SIMULACIÓN ===");
+        Thread.getAllStackTraces().keySet().forEach(t -> {
+            if (t.getName().startsWith("Thread-")) { // Filtra solo los hilos creados dinámicamente
+                System.out.println("Thread: " + t.getName() + " - Estado: " + t.getState());
+            }
+        });
+        System.out.println("Todos los hilos de la simulación han finalizado.");
 
         System.out.println("Simulación terminada");
     }

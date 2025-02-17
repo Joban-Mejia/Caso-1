@@ -18,8 +18,14 @@ public class EquipoCalidad extends Thread {
     @Override
     public void run() {
         while (!Main.finalizado) {
-            Producto producto = buzonRevision.retirar();
-            if (producto == null) continue; // Evitar null si la producción finalizó
+            Producto producto;
+
+            // Espera semiactiva // corrección
+            while ((producto = buzonRevision.retirar()) == null) 
+            {
+                Thread.yield(); 
+                if (Main.finalizado) return;
+            }
 
             int resultadoRevision = random.nextInt(100) + 1;
             boolean esDefectuoso = resultadoRevision % 7 == 0;
@@ -43,6 +49,7 @@ public class EquipoCalidad extends Thread {
             if (fallosActuales >= maxFallos) { 
                 synchronized (buzonReproceso) {
                     System.out.println("Generando producto FIN y notificando a los productores");
+                    Main.finalizado = true;
                     buzonReproceso.agregar(new Producto(EstadoProducto.FIN));
                     buzonReproceso.notifyAll();
                 }
