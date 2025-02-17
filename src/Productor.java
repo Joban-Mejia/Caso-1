@@ -57,15 +57,16 @@ public class Productor extends Thread {
 
             /* Almacenamos el producto en el Buzón de Revisión */
             synchronized (buzonRevision) {
-                while (buzonRevision.estaLleno()) {
+                while (buzonRevision.estaLleno() && !Main.finalizado) {
                     try {
                         System.out.println("Buzón de revisión lleno, esperando espacio...");
-                        buzonRevision.wait(); // Espera pasiva
+                        buzonRevision.wait(5000); // Espera pasiva
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                         return;
                     }
                 }
+                if (Main.finalizado) return;
                 buzonRevision.agregar(producto);
             }
         }
