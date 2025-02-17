@@ -25,14 +25,14 @@ public class Main {
 
         List<Thread> hilos = new ArrayList<>();
 
-        // Crea un thread por cada productor
+        /* Creamoos un thread por caad productor */
         for (int i = 0; i < numOperarios; i++) {
             Productor productor = new Productor(buzonReproceso, buzonRevision, numProductos);
             hilos.add(productor);
             productor.start();
         }
 
-        // Crea un thread por cada operario de equipo de calidad
+        /* Creamos un thread por cada operario de equipo de calidad */
         for (int i = 0; i < numOperarios; i++) {
             EquipoCalidad equipoCalidad = new EquipoCalidad(buzonRevision, buzonReproceso, deposito, numProductos);
             hilos.add(equipoCalidad);
@@ -57,7 +57,7 @@ public class Main {
             }
         }
 
-        //Imprimir estado final de los hilos
+        /* Imprimir estado final de los hilos */
         System.out.println("\n=== ESTADO FINAL DE LOS HILOS ===");
         Thread.getAllStackTraces().keySet().forEach(t -> {
             if (t.getName().startsWith("Thread-")) {

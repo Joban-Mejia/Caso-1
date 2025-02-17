@@ -22,7 +22,7 @@ public class EquipoCalidad extends Thread {
             Producto producto;
 
             // Espera semiactiva // corrección
-            /* aqui uso waiten lugar de yield */
+            /* aqui uso waiten lugar de yield, toca revisalo despuies */
             synchronized (buzonRevision) {
                 while ((producto = buzonRevision.retirar()) == null && !Main.finalizado) {
                     try {
@@ -47,7 +47,7 @@ public class EquipoCalidad extends Thread {
                     producto.setEstado(EstadoProducto.RECHAZADO);
                     fallosActuales++;
                     buzonReproceso.agregar(producto);
-                    System.out.println("Producto rechazado ID =" + producto.getId() + " (Fallo #" + fallosActuales + ")");
+                    System.out.println("Producto rechazado ID = " + producto.getId() + " (Fallo #" + fallosActuales + ")");
                 }
 
                 else {
