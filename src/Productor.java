@@ -35,7 +35,7 @@ public class Productor extends Thread {
 
                     if (producto != null) {
                         producto.setEstado(EstadoProducto.REPROCESADO);
-                        System.out.println("Reprocesando producto ID=" + producto.getId());
+                        System.out.println("Reprocesando producto ID = " + producto.getId());
                     }
                 }
             }
