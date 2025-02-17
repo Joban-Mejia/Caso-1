@@ -10,10 +10,10 @@ public class Deposito {
 
     public synchronized void agregar(Producto producto) {
         productosAprobados++;
-        System.out.println("Producto almacenado en el depósito: ID=" + producto.getId());
+        System.out.println("Producto almacenado en el depósito: ID = " + producto.getId());
 
         if (productosAprobados >= meta) {
-            System.out.println("Meta alcanzada. Enviando Producto FIN...");
+            System.out.println("===================== Meta alcanzada. Enviando Producto FIN... =====================");
             Producto fin = new Producto(EstadoProducto.FIN);
             buzonReproceso.agregar(fin);
         }
