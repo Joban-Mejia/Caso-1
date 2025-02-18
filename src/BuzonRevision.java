@@ -52,7 +52,7 @@ public class BuzonRevision {
     }
 
     public synchronized void esperar() throws InterruptedException {
-        while (estaLleno() && !Main.finalizado) { // Espera pasiva con verificación de FIN
+        while (estaLleno() && !Main.finalizado) { // Espera pasiva --- verifica FIN
             wait();
         }
     }
