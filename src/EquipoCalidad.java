@@ -23,7 +23,7 @@ public class EquipoCalidad extends Thread {
 
             // Espera semiactiva con yield()
             while ((producto = buzonRevision.retirar()) == null && !Main.finalizado) {
-                Thread.yield(); 
+                Thread.yield();  
             }
 
             //termina de ejecutar si terminó

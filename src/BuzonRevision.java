@@ -21,7 +21,7 @@ public class BuzonRevision {
         }
         productos.add(producto);
         notifyAll();
-        System.out.println("Producto aprobado ID = " + producto.getId());
+       
 
     }
 
