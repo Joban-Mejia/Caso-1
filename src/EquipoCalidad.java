@@ -23,7 +23,7 @@ public class EquipoCalidad extends Thread {
             int intentos = 0; /* Contador para limitar los intentos de yield */
 
             // Espera semiactiva // corrección
-
+            //el wait y el yield se hacen adenro del monitor
             /* aqui uso waiten lugar de yield, toca revisalo despuies */
             synchronized (buzonRevision) {
                 while ((producto = buzonRevision.retirar()) == null && !Main.finalizado) {
