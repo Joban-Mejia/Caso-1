@@ -9,7 +9,7 @@ public class EquipoCalidad extends Thread {
     private final Random random = new Random();
 
     public EquipoCalidad(BuzonRevision buzonRevision, BuzonReproceso buzonReproceso, Deposito deposito,
-            int totalProductos) {
+                         int totalProductos) {
         this.buzonRevision = buzonRevision;
         this.buzonReproceso = buzonReproceso;
         this.deposito = deposito;
@@ -21,20 +21,12 @@ public class EquipoCalidad extends Thread {
         while (!Main.finalizado) {
             Producto producto;
 
-            // Espera semiactiva // corrección
-            /* aqui uso waiten lugar de yield, toca revisalo despuies */
-            synchronized (buzonRevision) {
-                while ((producto = buzonRevision.retirar()) == null && !Main.finalizado) {
-                    try {
-                        buzonRevision.wait();
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                        return;
-                    }
-                }
+            // Espera semiactiva con yield()
+            while ((producto = buzonRevision.retirar()) == null && !Main.finalizado) {
+                Thread.yield(); 
             }
 
-            /* Si la simulacion acabo termina */
+            //termina de ejecutar si terminó
             if (Main.finalizado)
                 return;
 
@@ -42,15 +34,12 @@ public class EquipoCalidad extends Thread {
             boolean esDefectuoso = resultadoRevision % 7 == 0;
 
             synchronized (this) {
-
                 if (esDefectuoso && fallosActuales < maxFallos) {
                     producto.setEstado(EstadoProducto.RECHAZADO);
                     fallosActuales++;
                     buzonReproceso.agregar(producto);
                     System.out.println("Producto rechazado ID = " + producto.getId() + " (Fallo #" + fallosActuales + ")");
-                }
-
-                else {
+                } else {
                     producto.setEstado(EstadoProducto.APROBADO);
                     deposito.agregar(producto);
                     System.out.println("Producto aprobado ID = " + producto.getId());
@@ -60,20 +49,6 @@ public class EquipoCalidad extends Thread {
                     }
                 }
             }
-            /* Esto ya se hace en Deposito, por eso lo comento
-            if (fallosActuales >= maxFallos) {
-                synchronized (buzonReproceso) {
-                    System.out.println("Generando producto FIN y notificando a los hilos");
-                    Main.finalizado = true;
-                    buzonReproceso.agregar(new Producto(EstadoProducto.FIN));
-                    buzonReproceso.notifyAll();
-                }
-                synchronized (buzonRevision) {
-                    buzonRevision.notifyAll();
-                }
-                return;
-
-            } */
         }
     }
 }
