@@ -27,9 +27,12 @@ public class EquipoCalidad extends Thread {
             }
 
             //termina de ejecutar si terminó
-            if (Main.finalizado)
+            if (Main.finalizado){
                 return;
+            }
+                
 
+                
             int resultadoRevision = random.nextInt(100) + 1;
             boolean esDefectuoso = resultadoRevision % 7 == 0;
 
