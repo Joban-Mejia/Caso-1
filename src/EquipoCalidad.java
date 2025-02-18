@@ -36,9 +36,8 @@ public class EquipoCalidad extends Thread {
             synchronized (this) {
                 if (esDefectuoso && fallosActuales < maxFallos) {
                     producto.setEstado(EstadoProducto.RECHAZADO);
-                    fallosActuales++;
                     buzonReproceso.agregar(producto);
-                    System.out.println("Producto rechazado ID = " + producto.getId() + " (Fallo #" + fallosActuales + ")");
+                    System.out.println("Producto rechazado ID = " + producto.getId());
                 } else {
                     producto.setEstado(EstadoProducto.APROBADO);
                     deposito.agregar(producto);

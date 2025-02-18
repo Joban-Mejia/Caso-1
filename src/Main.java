@@ -41,15 +41,15 @@ public class Main {
 
         for (Thread hilo : hilos) {
             try {
-                hilo.join(5000); /* Esperar hasta 5 segundos por cada hilo */
+                hilo.join(5000); 
                 if (hilo.isAlive()) {
-                    System.out.println("El hilo " + hilo.getName() + " sigue vivo, forzando finalización...");
+            
                     finalizado = true; /* Marcar finalizado si algún hilo sigue vivo */
                     synchronized (buzonRevision) {
-                        buzonRevision.notifyAll(); /* Despertar hilos bloqueados */
+                        buzonRevision.notifyAll(); 
                     }
                     synchronized (buzonReproceso) {
-                        buzonReproceso.notifyAll();  /* Despertar hilos bloqueados */
+                        buzonReproceso.notifyAll();  
                     }
                 }
             } catch (InterruptedException e) {
