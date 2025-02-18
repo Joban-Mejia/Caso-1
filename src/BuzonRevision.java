@@ -25,6 +25,8 @@ public class BuzonRevision {
 
     }
 
+
+    
     public synchronized Producto retirar() {
         while (productos.isEmpty() && !Main.finalizado) {
             try {
@@ -48,4 +50,12 @@ public class BuzonRevision {
     public synchronized boolean estaLleno() {
         return productos.size() >= capacidad;
     }
+
+    public synchronized void esperar() throws InterruptedException {
+        while (estaLleno() && !Main.finalizado) { // Espera pasiva con verificación de FIN
+            wait();
+        }
+    }
+
+
 }

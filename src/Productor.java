@@ -56,7 +56,7 @@ public class Productor extends Thread {
                 while (buzonRevision.estaLleno()) {
                     try {
                         System.out.println("Buzón de revisión lleno, esperando espacio...");
-                        buzonRevision.wait(); // Espera pasiva
+                        buzonRevision.esperar();
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                         return;
